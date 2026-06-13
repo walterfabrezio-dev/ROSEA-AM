@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trismeg Rosea - Art Gallery</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --text-primary: #e0e0e0;
+            --accent: #c9a96e;
+            --secondary: #16213e;
+            --card-bg: #0f3460;
+            --price-color: #e94560;
+            --border: #c9a96e;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', 'Georgia', 'Noto Serif SC', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* 语言选择器 - 修复位置 */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--accent);
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            border-radius: 4px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-primary);
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* 密码保护层 */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 4000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .password-form {
+            text-align: center;
+            padding: 3rem;
+            border: 1px solid var(--accent);
+            background: rgba(15, 52, 96, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .password-form h2 {
+            color: var(--accent);
+            margin-bottom: 2rem;
+            letter-spacing: 0.3em;
+            font-weight: 300;
+        }
+
+        .password-input {
+            background: transparent;
+            border: 1px solid var(--accent);
+            padding: 0.8rem 1.5rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            width: 250px;
+        }
+
+        .password-submit {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            transition: var(--transition);
+            display: block;
+            width: 250px;
+            margin: 0 auto;
+        }
+
+        .password-submit:hover {
+            background: #b8944f;
+        }
+
+        .password-error {
+            color: var(--price-color);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* 首页 - 两个入口 - 修复字体大小 */
+        .landing-page {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .landing-page::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 1px;
+            height: 70%;
+            background: var(--accent);
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        .portal-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4rem;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .portal {
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 2rem 2.5rem;
+            text-align: center;
+            position: relative;
+            background: transparent;
+            border: 2px solid transparent;
+            min-width: 280px;
+        }
+
+        .portal:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+            background: rgba(201, 169, 110, 0.05);
+            box-shadow: 0 0 50px rgba(201, 169, 110, 0.2);
+        }
+
+        .portal h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: var(--text-primary);
+            transition: var(--transition);
+            margin: 0;
+            text-transform: uppercase;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .portal:hover h1 {
+            color: var(--accent);
+            letter-spacing: 0.3em;
+        }
+
+        .portal-subtitle {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: var(--transition);
+            letter-spacing: 0.2em;
+        }
+
+        .portal:hover .portal-subtitle {
+            opacity: 1;
+        }
+
+        /* 导航栏 - 修复布局 */
+        .navbar {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            display: none;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .navbar.active {
+            display: flex;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.3rem 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            color: var(--text-primary);
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+            transition: var(--transition);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            color: var(--accent);
+        }
+
+        .admin-nav-btn {
+            border: 1px solid var(--accent);
+            padding: 0.4rem 1rem;
+        }
+
+        /* 主容器 */
+        .main-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .main-container.active {
+            display: block;
+        }
+
+        /* 个人页面 */
+        .personal-page {
+            display: none;
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease;
+        }
+
+        .personal-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .artist-profile {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .artist-name {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            word-wrap: break-word;
+        }
+
+        .artist-bio {
+            font-size: 1.1rem;
+            line-height: 2;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--text-primary);
+            padding: 0 1rem;
+        }
+
+        .artist-statement {
+            margin: 3rem 0;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            background: rgba(201, 169, 110, 0.05);
+        }
+
+        .artist-statement h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            letter-spacing: 0.15em;
+        }
+
+        .artist-statement p {
+            line-height: 2;
+            margin-bottom: 1rem;
+        }
+
+        /* 画廊容器 */
+        .gallery-container {
+            display: none;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-container.active {
+            display: block;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            background: var(--card-bg);
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar select, .filter-bar input {
+            padding: 0.6rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* 画作网格 */
+        .artworks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .artwork-card {
+            background: var(--card-bg);
+            border: 1px solid transparent;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .artwork-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+            transform: translateY(-5px);
+        }
+
+        .artwork-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .artwork-card:hover .artwork-image {
+            transform: scale(1.05);
+        }
+
+        .artwork-info {
+            padding: 1.2rem;
+        }
+
+        .artwork-title {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.08em;
+            word-wrap: break-word;
+        }
+
+        .artwork-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin: 0.8rem 0;
+            font-size: 0.85rem;
+        }
+
+        .artwork-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .artwork-meta-label {
+            color: var(--accent);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .artwork-meta-value {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+
+        .artwork-price {
+            font-size: 1.6rem;
+            color: var(--price-color);
+            font-weight: bold;
+            margin: 0.8rem 0;
+        }
+
+        .buy-btn, .inquiry-btn {
+            width: 100%;
+            padding: 0.7rem;
+            margin-top: 0.4rem;
+            border: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.08em;
+        }
+
+        .buy-btn {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .buy-btn:hover {
+            background: #b8944f;
+        }
+
+        .inquiry-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .inquiry-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        /* 管理面板 */
+        .admin-panel {
+            display: none;
+            background: var(--card-bg);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-auth {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .admin-auth input {
+            background: transparent;
+            border: 1px solid var(--accent);
+            padding: 0.7rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            margin: 0.5rem;
+            width: 220px;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.85rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            background: rgba(201, 169, 110, 0.1);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 250px;
+            margin-top: 0.8rem;
+        }
+
+        .action-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.08em;
+            margin-right: 0.8rem;
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .save-btn:hover {
+            background: #b8944f;
+        }
+
+        .cancel-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .cancel-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: 1px solid var(--price-color);
+            color: var(--price-color);
+        }
+
+        .delete-btn:hover {
+            background: var(--price-color);
+            color: white;
+        }
+
+        /* 主题定制 */
+        .theme-customizer {
+            display: none;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .theme-customizer.active {
+            display: block;
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .color-picker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .color-picker input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        .color-picker span {
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+        }
+
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--accent);
+            background: none;
+            border: none;
+            padding: 0 0.5rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+            display: none;
+        }
+
+        .footer.active {
+            display: block;
+        }
+
+        .copyright {
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            z-index: 3000;
+            letter-spacing: 0.08em;
+        }
+
+        /* 艺术品列表管理样式 */
+        .artwork-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid var(--border);
+            margin-bottom: 0.4rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .artwork-list-item .item-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .artwork-list-item .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .portal h1 {
+                font-size: 2rem;
+            }
+            
+            .portal {
+                padding: 1.5rem 2rem;
+                min-width: 240px;
+            }
+            
+            .portal-container {
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .language-selector {
+                top: 10px;
+                right: 10px;
+                flex-direction: row;
+                gap: 0.2rem;
+                padding: 0.3rem;
+            }
+            
+            .lang-btn {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
+            }
+            
+            .portal-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .portal h1 {
+                font-size: 1.8rem;
+                letter-spacing: 0.15em;
+            }
+            
+            .portal {
+                padding: 1.2rem 1.5rem;
+                min-width: 200px;
+                width: 90%;
+            }
+            
+            .navbar {
+                padding: 0.6rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.5rem;
+            }
+            
+            .nav-btn {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.5rem;
+            }
+            
+            .artworks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .artist-name {
+                font-size: 2rem;
+            }
+            
+            .artwork-image {
+                height: 280px;
+            }
+            
+            .personal-page {
+                padding: 2rem 1rem;
+            }
+            
+            .artist-statement {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .language-selector {
+                top: 5px;
+                right: 5px;
+                padding: 0.2rem;
+            }
+            
+            .lang-btn {
+                padding: 0.15rem 0.3rem;
+                font-size: 0.65rem;
+            }
+            
+            .portal h1 {
+                font-size: 1.5rem;
+            }
+            
+            .portal {
+                padding: 1rem;
+                min-width: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 管理员密码保护 -->
+    <div id="passwordOverlay" class="password-overlay" style="display: none;">
+        <div class="password-form">
+            <h2 id="passwordTitle">Administrator Access</h2>
+            <input type="password" id="adminPassword" class="password-input" placeholder="Enter Password">
+            <button class="password-submit" onclick="verifyAdmin()">Access</button>
+            <p id="passwordError" class="password-error">Incorrect password</p>
+            <button class="password-submit" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-top: 1rem;" onclick="closePasswordOverlay()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- 语言选择器 -->
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="changeLanguage('zh')" data-lang="zh">中文</button>
+        <button class="lang-btn" onclick="changeLanguage('en')" data-lang="en">EN</button>
+        <button class="lang-btn" onclick="changeLanguage('fr')" data-lang="fr">FR</button>
+        <button class="lang-btn" onclick="changeLanguage('it')" data-lang="it">IT</button>
+        <button class="lang-btn" onclick="changeLanguage('de')" data-lang="de">DE</button>
+    </div>
+
+    <!-- 登出按钮（仅管理员可见） -->
+    <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">Logout</button>
+
+    <!-- 首页入口 -->
+    <div id="landingPage" class="landing-page">
+        <div class="portal-container">
+            <div class="portal" onclick="showPersonal()">
+                <h1>Macroprosopus</h1>
+                <div class="portal-subtitle" data-i18n="portal1_subtitle">藝術家簡介</div>
+            </div>
+            <div class="portal" onclick="showGallery()">
+                <h1>Microprosopus</h1>
+                <div class="portal-subtitle" data-i18n="portal2_subtitle">畫作售賣</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav id="navbar" class="navbar">
+        <a class="logo" onclick="showLanding()">T·R</a>
+        <div class="nav-links">
+            <button class="nav-btn" onclick="showPersonal()" data-i18n="nav_macro">Macroprosopus</button>
+            <button class="nav-btn" onclick="showGallery()" data-i18n="nav_micro">Microprosopus</button>
+            <button class="nav-btn admin-nav-btn" onclick="openAdminPanel()" data-i18n="nav_admin">管理</button>
+            <button class="nav-btn" onclick="toggleTheme()" data-i18n="nav_theme">主題</button>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div id="mainContainer" class="main-container">
+        <!-- 个人页面 -->
+        <div id="personalPage" class="personal-page">
+            <div class="artist-profile">
+                <h1 class="artist-name">Trismeg Rosea</h1>
+                <div class="artist-bio">
+                    <p data-i18n="artist_bio">探索意識與存在的邊界，以畫筆描繪不可見的世界。</p>
+                    <p data-i18n="artist_bio2">每一幅作品都是對宏觀與微觀宇宙的沉思。</p>
+                </div>
+            </div>
+            <div class="artist-statement">
+                <h3 data-i18n="artist_statement_title">藝術家自述</h3>
+                <p data-i18n="artist_statement">在我的創作中，Macroprosopus代表著宏大的宇宙視角，而Microprosopus則聚焦於微觀的細節世界。兩者相互映照，構成了我對藝術與存在的理解。</p>
+                <p data-i18n="artist_statement2">每一筆觸都是對生命本質的探索，每一幅畫作都是一次意識的旅程。</p>
+            </div>
+        </div>
+
+        <!-- 画廊页面 -->
+        <div id="galleryPage" class="gallery-container">
+            <!-- 主题定制面板 -->
+            <div id="themeCustomizer" class="theme-customizer">
+                <h3 style="color: var(--accent); margin-bottom: 1rem;" data-i18n="theme_title">主題自訂</h3>
+                <div class="form-group">
+                    <label data-i18n="theme_colors">配色方案</label>
+                    <div class="color-picker-group">
+                        <div class="color-picker">
+                            <input type="color" id="bgPrimary" value="#1a1a2e" onchange="updateTheme()">
+                            <span data-i18n="theme_bg">背景色</span>
+                        </div>
+                        <div class="color-picker">
+                            <input type="color" id="accentColor" value="#c9a96e" onchange="updateTheme()">
+                            <span data-i18n="theme_accent">強調色</span>
+                        </div>
+                        <div class="color-picker">
+                            <input type="color" id="cardBg" value="#0f3460" onchange="updateTheme()">
+                            <span data-i18n="theme_card">卡片背景</span>
+                        </div>
+                        <div class="color-picker">
+                            <input type="color" id="textColor" value="#e0e0e0" onchange="updateTheme()">
+                            <span data-i18n="theme_text">文字色</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="action-btn save-btn" onclick="saveTheme()" data-i18n="theme_save">儲存主題</button>
+                <button class="action-btn cancel-btn" onclick="toggleTheme()" data-i18n="theme_close">關閉</button>
+            </div>
+
+            <!-- 管理面板 -->
+            <div id="adminPanel" class="admin-panel">
+                <div id="adminAuth" class="admin-auth">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem;" data-i18n="admin_login_title">管理員登入</h3>
+                    <input type="password" id="adminLoginPassword" data-i18n-placeholder="admin_password_placeholder" placeholder="請輸入管理密碼">
+                    <button class="action-btn save-btn" onclick="adminLogin()" data-i18n="admin_login_btn">登入</button>
+                    <p id="adminLoginError" style="color: var(--price-color); display: none; margin-top: 0.5rem;" data-i18n="admin_login_error">密碼錯誤</p>
+                </div>
+                
+                <div id="adminContent" style="display: none;">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem;" data-i18n="admin_title">畫作管理</h3>
+                    <button class="action-btn save-btn" onclick="showAddForm()" style="margin-bottom: 1rem;" data-i18n="admin_add">+ 新增畫作</button>
+                    
+                    <div id="artworkForm" style="display: none;">
+                        <input type="hidden" id="artworkId">
+                        
+                        <div class="form-group">
+                            <label data-i18n="form_title">畫作名稱</label>
+                            <input type="text" id="artworkTitle" data-i18n-placeholder="form_title_placeholder" placeholder="請輸入畫作名稱">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="form_type">畫作類型</label>
+                            <select id="artworkType">
+                                <option value="油畫" data-i18n="type_oil">油畫</option>
+                                <option value="水彩" data-i18n="type_watercolor">水彩</option>
+                                <option value="素描" data-i18n="type_sketch">素描</option>
+                                <option value="丙烯" data-i18n="type_acrylic">丙烯</option>
+                                <option value="數字藝術" data-i18n="type_digital">數字藝術</option>
+                                <option value="混合媒材" data-i18n="type_mixed">混合媒材</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="form_character">畫作中的角色</label>
+                            <input type="text" id="artworkCharacter" data-i18n-placeholder="form_character_placeholder" placeholder="請輸入角色名稱">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="form_price">價格 (HK$)</label>
+                            <input type="number" id="artworkPrice" placeholder="0.00" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="form_image">上傳圖片</label>
+                            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                                <p data-i18n="form_upload_text">點擊上傳圖片或拖拽至此</p>
+                                <p style="font-size: 0.8rem; color: var(--accent);" data-i18n="form_upload_format">支援 JPG、PNG、WebP 格式</p>
+                                <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+                            </div>
+                            <img id="imagePreview" class="image-preview" style="display: none;">
+                            <input type="hidden" id="artworkImage" value="">
+                        </div>
+                        
+                        <button class="action-btn save-btn" onclick="saveArtwork()" data-i18n="form_save">儲存畫作</button>
+                        <button class="action-btn cancel-btn" onclick="cancelForm()" data-i18n="form_cancel">取消</button>
+                    </div>
+                    
+                    <div id="artworkList" style="margin-top: 1.5rem;"></div>
+                </div>
+            </div>
+
+            <!-- 筛选栏 -->
+            <div class="filter-bar">
+                <select id="typeFilter" onchange="filterArtworks()">
+                    <option value="all" data-i18n="filter_all">所有類型</option>
+                </select>
+                <input type="text" id="searchInput" data-i18n-placeholder="filter_search" placeholder="搜尋畫作..." oninput="filterArtworks()">
+            </div>
+
+            <!-- 画作展示 -->
+            <div id="artworksGrid" class="artworks-grid"></div>
+        </div>
+    </div>
+
+    <!-- 画作详情弹窗 -->
+    <div id="artworkModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer id="footer" class="footer">
+        <p class="copyright">&copy; 2024 T·R·AM. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ===== 配置 =====
+        const ADMIN_PASSWORD = 'Trismeg2024!'; // 请更改为您的密码
+        
+        const ARTIST_INFO = {
+            name: 'Trismeg Rosea',
+            copyright: 'T·R·AM'
+        };
+
+        // ===== 多语言翻译 =====
+        const translations = {
+            zh: {
+                portal1_subtitle: '藝術家簡介',
+                portal2_subtitle: '畫作售賣',
+                nav_macro: 'Macroprosopus',
+                nav_micro: 'Microprosopus',
+                nav_admin: '管理',
+                nav_theme: '主題',
+                artist_bio: '探索意識與存在的邊界，以畫筆描繪不可見的世界。',
+                artist_bio2: '每一幅作品都是對宏觀與微觀宇宙的沉思。',
+                artist_statement_title: '藝術家自述',
+                artist_statement: '在我的創作中，Macroprosopus代表著宏大的宇宙視角，而Microprosopus則聚焦於微觀的細節世界。兩者相互映照，構成了我對藝術與存在的理解。',
+                artist_statement2: '每一筆觸都是對生命本質的探索，每一幅畫作都是一次意識的旅程。',
+                theme_title: '主題自訂',
+                theme_colors: '配色方案',
+                theme_bg: '背景色',
+                theme_accent: '強調色',
+                theme_card: '卡片背景',
+                theme_text: '文字色',
+                theme_save: '儲存主題',
+                theme_close: '關閉',
+                admin_login_title: '管理員登入',
+                admin_password_placeholder: '請輸入管理密碼',
+                admin_login_btn: '登入',
+                admin_login_error: '密碼錯誤',
+                admin_title: '畫作管理',
+                admin_add: '+ 新增畫作',
+                form_title: '畫作名稱',
+                form_title_placeholder: '請輸入畫作名稱',
+                form_type: '畫作類型',
+                form_character: '畫作中的角色',
+                form_character_placeholder: '請輸入角色名稱',
+                form_price: '價格 (HK$)',
+                form_image: '上傳圖片',
+                form_upload_text: '點擊上傳圖片或拖拽至此',
+                form_upload_format: '支援 JPG、PNG、WebP 格式',
+                form_save: '儲存畫作
